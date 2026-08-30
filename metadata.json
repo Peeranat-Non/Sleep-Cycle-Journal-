@@ -1,0 +1,6 @@
+{
+  "name": "นอนบ้าง - Sleep Cycle & Journal",
+  "description": "เว็บแอปช่วยวางแผนเวลานอนที่เหมาะสมตามรอบการนอน 90 นาที และบันทึกคุณภาพการนอนประจำวัน",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
