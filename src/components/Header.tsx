@@ -13,18 +13,27 @@ import {
   TrendingUp,
   ArrowRight,
 } from 'lucide-react';
+import { SleepRecord } from '../types';
+import { SleepAvatar } from './SleepAvatar';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  records?: SleepRecord[];
+}
+
+export const Header: React.FC<HeaderProps> = ({ records = [] }) => {
   const [showInfo, setShowInfo] = useState(false);
   const [showHowTo, setShowHowTo] = useState(false);
 
   return (
-    <header id="app-header" className="relative text-center pt-8 pb-6 px-4">
+    <header id="app-header" className="relative text-center pt-6 pb-4 px-4 space-y-4">
       {/* Subtle night-sky glow background effect */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-xl h-32 bg-indigo-500/10 blur-3xl -z-10 rounded-full pointer-events-none" />
 
+      {/* 1. Dynamic Sleep Character Avatar Banner prominently positioned at top */}
+      <SleepAvatar records={records} />
+
       {/* Main App Title */}
-      <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-indigo-950/70 border border-indigo-500/30 text-indigo-300 text-xs sm:text-sm font-medium mb-3 shadow-inner">
+      <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-indigo-950/70 border border-indigo-500/30 text-indigo-300 text-xs sm:text-sm font-medium shadow-inner">
         <Stars className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
         <span>Sleep Cycle & Sleep Journal</span>
         <Sparkles className="w-3.5 h-3.5 text-indigo-400" />

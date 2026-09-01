@@ -178,8 +178,8 @@ export default function App() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Header section with App Title & Sleep Cycle guide */}
-        <Header />
+        {/* Header section with App Title, Sleep Avatar & Sleep Cycle guide */}
+        <Header records={records} />
 
         {/* Section 1: Sleep Cycle Calculator with 2 Modes */}
         <SleepCycleCalculator
