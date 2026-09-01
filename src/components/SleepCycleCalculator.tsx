@@ -63,50 +63,54 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
       id="sleep-calculator-section"
       className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <div>
-          <h2
-            id="calculator-heading"
-            className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
-          >
-            <Clock className="w-6 h-6 text-indigo-400" />
-            คำนวณรอบการนอน
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            นับรอบการนอน 90 นาที/รอบ + เผื่อเวลาเคลิ้มหลับ 15 นาที
-          </p>
-        </div>
-
-        {/* Mode Switch Tabs */}
-        <div
-          id="calculator-mode-tabs"
-          className="inline-flex p-1 bg-slate-950/80 rounded-2xl border border-slate-800 self-start sm:self-auto"
+      {/* Title & Description */}
+      <div className="mb-5">
+        <h2
+          id="calculator-heading"
+          className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
         >
+          <Clock className="w-6 h-6 text-purple-400" />
+          คำนวณรอบการนอน
+        </h2>
+        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          นับรอบการนอน 90 นาที/รอบ + เผื่อเวลาเคลิ้มหลับ 15 นาที เพื่อให้คุณตื่นนอนได้อย่างสดชื่น
+        </p>
+      </div>
+
+      {/* Prominent Full-Width 2-Tab Mode Switcher */}
+      <div
+        id="calculator-mode-tabs-container"
+        className="w-full mb-6 p-1.5 bg-slate-950/90 rounded-2xl border border-slate-800 shadow-inner"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* Tab 1: ตื่นกี่โมงดี */}
           <button
             id="tab-wake-mode"
             type="button"
             onClick={() => setMode('wake')}
-            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+            className={`w-full py-3 sm:py-3.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 select-none ${
               mode === 'wake'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-950/80 border border-indigo-400/40 ring-2 ring-indigo-500/20'
+                : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
             }`}
           >
-            <Sun className="w-4 h-4" />
-            <span>ตื่นกี่โมงดี</span>
+            <span className="text-base">🌙</span>
+            <span className="tracking-wide">ตื่นกี่โมงดี? (นอนเวลานี้)</span>
           </button>
+
+          {/* Tab 2: เข้านอนกี่โมงดี */}
           <button
             id="tab-bed-mode"
             type="button"
             onClick={() => setMode('bed')}
-            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+            className={`w-full py-3 sm:py-3.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 select-none ${
               mode === 'bed'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-950/80 border border-indigo-400/40 ring-2 ring-indigo-500/20'
+                : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
             }`}
           >
-            <Moon className="w-4 h-4" />
-            <span>เข้านอนกี่โมงดี</span>
+            <span className="text-base">☀️</span>
+            <span className="tracking-wide">เข้านอนกี่โมงดี? (ตื่นเวลานี้)</span>
           </button>
         </div>
       </div>
@@ -260,6 +264,48 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
             {results.map((item) => {
               const isRec = item.isRecommended;
 
+              // Color config per cycle tier
+              // cycles 3 = ขั้นต่ำ (ส้ม/แดง)
+              // cycles 4 = พอใช้ (เหลือง)
+              // cycles 5 = แนะนำ (ม่วง)
+              // cycles 6 = เต็มอิ่ม (เขียว)
+              const getBadgeConfig = (cycles: number) => {
+                switch (cycles) {
+                  case 3:
+                    return {
+                      badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-400/50',
+                      durationColor: 'text-rose-400 font-bold',
+                      cardBorder: 'hover:border-rose-500/40',
+                    };
+                  case 4:
+                    return {
+                      badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/50',
+                      durationColor: 'text-amber-400 font-bold',
+                      cardBorder: 'hover:border-amber-500/40',
+                    };
+                  case 5:
+                    return {
+                      badgeClass: 'bg-purple-600/30 text-purple-200 border-purple-400/60 font-bold shadow-md shadow-purple-950/60',
+                      durationColor: 'text-purple-300 font-bold',
+                      cardBorder: 'hover:border-purple-400/70',
+                    };
+                  case 6:
+                    return {
+                      badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50',
+                      durationColor: 'text-emerald-400 font-bold',
+                      cardBorder: 'hover:border-emerald-500/40',
+                    };
+                  default:
+                    return {
+                      badgeClass: 'bg-slate-800 border-slate-700 text-slate-300',
+                      durationColor: 'text-indigo-300 font-bold',
+                      cardBorder: 'hover:border-slate-700',
+                    };
+                }
+              };
+
+              const tierStyle = getBadgeConfig(item.cycles);
+
               return (
                 <div
                   key={item.cycles}
@@ -267,18 +313,14 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                   onClick={() => handleApplyToJournal(item)}
                   className={`group relative p-4 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
                     isRec
-                      ? 'bg-gradient-to-b from-indigo-950/90 to-slate-900 border-indigo-500/60 shadow-lg shadow-indigo-950/50 hover:border-indigo-400 hover:scale-[1.02]'
-                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/80'
+                      ? 'bg-gradient-to-b from-purple-950/70 via-slate-900 to-slate-950 border-purple-500/60 shadow-lg shadow-purple-950/60 hover:border-purple-400 hover:scale-[1.02]'
+                      : `bg-slate-950/70 border-slate-800/90 ${tierStyle.cardBorder} hover:bg-slate-900/80`
                   }`}
                 >
                   {item.tag && (
                     <div className="absolute -top-2.5 left-3">
                       <span
-                        className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full border shadow-sm ${
-                          isRec
-                            ? 'bg-indigo-600 border-indigo-400 text-white'
-                            : 'bg-slate-800 border-slate-700 text-slate-300'
-                        }`}
+                        className={`text-[10px] uppercase font-semibold px-2.5 py-0.5 rounded-full border shadow-sm backdrop-blur-sm ${tierStyle.badgeClass}`}
                       >
                         {item.tag}
                       </span>
@@ -288,7 +330,7 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                   <div className="mt-1">
                     <div className="text-xs text-slate-400 flex items-center justify-between">
                       <span>{mode === 'wake' ? 'ตื่นตอน' : 'เข้านอนตอน'}</span>
-                      <span className="text-indigo-300 font-medium">
+                      <span className="text-slate-300 font-medium">
                         ({item.cycles} รอบการนอน)
                       </span>
                     </div>
@@ -297,7 +339,15 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                       {item.timeFormatted} <span className="text-sm font-normal text-slate-400">น.</span>
                     </div>
 
-                    <div className="text-[11px] text-slate-400 leading-tight">
+                    {/* Highlighted Total Sleep Duration */}
+                    <div className="mt-2 p-2 rounded-xl bg-slate-900/90 border border-slate-800/80 flex items-center justify-between">
+                      <span className="text-[11px] text-slate-400">เวลานอนรวม:</span>
+                      <span className={`text-xs ${tierStyle.durationColor}`}>
+                        {item.hours} ชม. {item.minutes > 0 ? `${item.minutes} น.` : ''}
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] text-slate-400 leading-tight mt-2">
                       {item.subtext}
                     </div>
                   </div>
