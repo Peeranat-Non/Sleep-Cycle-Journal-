@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Clock, Sparkles, ArrowRight, Check, Zap } from 'lucide-react';
+import { Moon, Sun, Clock, Sparkles, ArrowRight, Check, Zap, AlertCircle } from 'lucide-react';
 import { CalculatorMode, CycleResult } from '../types';
 import {
   calculateWakeTimes,
@@ -15,22 +15,33 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
   onSelectTimeToJournal,
 }) => {
   const [mode, setMode] = useState<CalculatorMode>('wake');
-  const [inputBedTime, setInputBedTime] = useState<string>('23:00');
-  const [inputWakeTime, setInputWakeTime] = useState<string>('07:00');
+  // Initialize with current time
+  const [inputBedTime, setInputBedTime] = useState<string>(() => getCurrentTimeFormatted());
+  const [inputWakeTime, setInputWakeTime] = useState<string>(() => getCurrentTimeFormatted());
   const [appliedNotice, setAppliedNotice] = useState<string | null>(null);
 
   const handleSetNow = () => {
     const current = getCurrentTimeFormatted();
-    setInputBedTime(current);
+    if (mode === 'wake') {
+      setInputBedTime(current);
+    } else {
+      setInputWakeTime(current);
+    }
   };
 
-  const results: CycleResult[] =
+  const isCurrentTimeValid =
     mode === 'wake'
+      ? Boolean(inputBedTime && inputBedTime.trim() !== '' && inputBedTime.includes(':'))
+      : Boolean(inputWakeTime && inputWakeTime.trim() !== '' && inputWakeTime.includes(':'));
+
+  const results: CycleResult[] = isCurrentTimeValid
+    ? mode === 'wake'
       ? calculateWakeTimes(inputBedTime)
-      : calculateBedTimes(inputWakeTime);
+      : calculateBedTimes(inputWakeTime)
+    : [];
 
   const handleApplyToJournal = (result: CycleResult) => {
-    if (!onSelectTimeToJournal) return;
+    if (!onSelectTimeToJournal || !isCurrentTimeValid) return;
 
     if (mode === 'wake') {
       // Bed is inputBedTime, Wake is result.timeFormatted
@@ -103,7 +114,9 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
       {/* Input Form Box */}
       <div
         id="calculator-input-box"
-        className="p-4 sm:p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80 mb-6"
+        className={`p-4 sm:p-5 rounded-2xl bg-slate-950/60 border transition-all mb-6 ${
+          isCurrentTimeValid ? 'border-slate-800/80' : 'border-rose-500/60 ring-1 ring-rose-500/30'
+        }`}
       >
         {mode === 'wake' ? (
           <div>
@@ -129,15 +142,29 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                 <input
                   id="input-bedtime"
                   type="time"
+                  required
                   value={inputBedTime}
                   onChange={(e) => setInputBedTime(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                  className={`bg-slate-900 border text-white rounded-xl px-3.5 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors ${
+                    inputBedTime ? 'border-slate-700' : 'border-rose-500 bg-rose-950/20'
+                  }`}
                 />
               </div>
             </div>
-            <p className="text-xs text-slate-400 mt-2">
-              💡 หากคุณเข้านอนตอน <strong>{inputBedTime} น.</strong> ควรตั้งนาฬิกาปลุกเวลาใดเพื่อให้ตื่นอย่างสดชื่น:
-            </p>
+
+            {isCurrentTimeValid ? (
+              <p className="text-xs text-slate-400 mt-2">
+                💡 หากคุณเข้านอนตอน <strong>{inputBedTime} น.</strong> ควรตั้งนาฬิกาปลุกเวลาใดเพื่อให้ตื่นอย่างสดชื่น:
+              </p>
+            ) : (
+              <div
+                id="error-bedtime-required"
+                className="mt-3 flex items-center gap-1.5 text-xs sm:text-sm font-medium text-rose-400 animate-fade-in"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>กรุณาเลือกเวลาให้ครบถ้วน</span>
+              </div>
+            )}
           </div>
         ) : (
           <div>
@@ -170,15 +197,29 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                 <input
                   id="input-waketime"
                   type="time"
+                  required
                   value={inputWakeTime}
                   onChange={(e) => setInputWakeTime(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                  className={`bg-slate-900 border text-white rounded-xl px-3.5 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors ${
+                    inputWakeTime ? 'border-slate-700' : 'border-rose-500 bg-rose-950/20'
+                  }`}
                 />
               </div>
             </div>
-            <p className="text-xs text-slate-400 mt-2">
-              💡 หากคุณต้องตื่นตอน <strong>{inputWakeTime} น.</strong> ควรเริ่มเข้านอนในเวลาใด:
-            </p>
+
+            {isCurrentTimeValid ? (
+              <p className="text-xs text-slate-400 mt-2">
+                💡 หากคุณต้องตื่นตอน <strong>{inputWakeTime} น.</strong> ควรเริ่มเข้านอนในเวลาใด:
+              </p>
+            ) : (
+              <div
+                id="error-waketime-required"
+                className="mt-3 flex items-center gap-1.5 text-xs sm:text-sm font-medium text-rose-400 animate-fade-in"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>กรุณาเลือกเวลาให้ครบถ้วน</span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -197,67 +238,81 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
       <div className="space-y-2.5">
         <div className="flex items-center justify-between text-xs text-slate-400 font-medium px-1">
           <span>เวลาที่เหมาะสม 4 ตัวเลือก (เรียงจากน้อยไปมาก):</span>
-          <span>คลิกการ์ดเพื่อนำไปลงบันทึก</span>
+          <span>{isCurrentTimeValid ? 'คลิกการ์ดเพื่อนำไปลงบันทึก' : 'ระบุเวลาเพื่อดูผลลัพธ์'}</span>
         </div>
 
-        <div
-          id="cycle-results-grid"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
-        >
-          {results.map((item) => {
-            const isRec = item.isRecommended;
+        {!isCurrentTimeValid ? (
+          <div
+            id="calculator-empty-validation-box"
+            className="p-8 rounded-2xl bg-slate-950/40 border border-rose-500/30 text-center text-rose-300 space-y-2"
+          >
+            <AlertCircle className="w-8 h-8 text-rose-400 mx-auto" />
+            <div className="font-semibold text-rose-400">กรุณาเลือกเวลาให้ครบถ้วน</div>
+            <p className="text-xs text-slate-400">
+              กรุณาระบุเวลา{mode === 'wake' ? 'เข้านอน' : 'ตื่นนอน'}ในช่องด้านบนเพื่อเริ่มคำนวณรอบการนอน 90 นาที
+            </p>
+          </div>
+        ) : (
+          <div
+            id="cycle-results-grid"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
+          >
+            {results.map((item) => {
+              const isRec = item.isRecommended;
 
-            return (
-              <div
-                key={item.cycles}
-                id={`cycle-card-${item.cycles}`}
-                onClick={() => handleApplyToJournal(item)}
-                className={`group relative p-4 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
-                  isRec
-                    ? 'bg-gradient-to-b from-indigo-950/90 to-slate-900 border-indigo-500/60 shadow-lg shadow-indigo-950/50 hover:border-indigo-400 hover:scale-[1.02]'
-                    : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/80'
-                }`}
-              >
-                {item.tag && (
-                  <div className="absolute -top-2.5 left-3">
-                    <span
-                      className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full border shadow-sm ${
-                        isRec
-                          ? 'bg-indigo-600 border-indigo-400 text-white'
-                          : 'bg-slate-800 border-slate-700 text-slate-300'
-                      }`}
-                    >
-                      {item.tag}
-                    </span>
+              return (
+                <div
+                  key={item.cycles}
+                  id={`cycle-card-${item.cycles}`}
+                  onClick={() => handleApplyToJournal(item)}
+                  className={`group relative p-4 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
+                    isRec
+                      ? 'bg-gradient-to-b from-indigo-950/90 to-slate-900 border-indigo-500/60 shadow-lg shadow-indigo-950/50 hover:border-indigo-400 hover:scale-[1.02]'
+                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/80'
+                  }`}
+                >
+                  {item.tag && (
+                    <div className="absolute -top-2.5 left-3">
+                      <span
+                        className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full border shadow-sm ${
+                          isRec
+                            ? 'bg-indigo-600 border-indigo-400 text-white'
+                            : 'bg-slate-800 border-slate-700 text-slate-300'
+                        }`}
+                      >
+                        {item.tag}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="mt-1">
+                    <div className="text-xs text-slate-400 flex items-center justify-between">
+                      <span>{mode === 'wake' ? 'ตื่นตอน' : 'เข้านอนตอน'}</span>
+                      <span className="text-indigo-300 font-medium">
+                        ({item.cycles} รอบการนอน)
+                      </span>
+                    </div>
+
+                    <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white my-1.5">
+                      {item.timeFormatted} <span className="text-sm font-normal text-slate-400">น.</span>
+                    </div>
+
+                    <div className="text-[11px] text-slate-400 leading-tight">
+                      {item.subtext}
+                    </div>
                   </div>
-                )}
 
-                <div className="mt-1">
-                  <div className="text-xs text-slate-400 flex items-center justify-between">
-                    <span>{mode === 'wake' ? 'ตื่นตอน' : 'เข้านอนตอน'}</span>
-                    <span className="text-indigo-300 font-medium">
-                      ({item.cycles} รอบการนอน)
-                    </span>
-                  </div>
-
-                  <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white my-1.5">
-                    {item.timeFormatted} <span className="text-sm font-normal text-slate-400">น.</span>
-                  </div>
-
-                  <div className="text-[11px] text-slate-400 leading-tight">
-                    {item.subtext}
+                  <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-indigo-300/80 group-hover:text-indigo-200">
+                    <span>นำเวลาไปใส่ฟอร์ม</span>
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
-
-                <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-indigo-300/80 group-hover:text-indigo-200">
-                  <span>นำเวลาไปใส่ฟอร์ม</span>
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
 };
+

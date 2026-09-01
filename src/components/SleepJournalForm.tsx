@@ -9,12 +9,14 @@ import {
   Clock,
   Sparkles,
   CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { MoodLevel, SleepRecord } from '../types';
 import { MOOD_OPTIONS } from '../constants/moods';
 import {
   calculateDuration,
   getTodayDateFormatted,
+  getCurrentTimeFormatted,
 } from '../utils/sleepMath';
 
 interface SleepJournalFormProps {
@@ -29,8 +31,13 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
   prefillWakeTime,
 }) => {
   const [date, setDate] = useState<string>(getTodayDateFormatted());
-  const [bedTime, setBedTime] = useState<string>('23:00');
-  const [wakeTime, setWakeTime] = useState<string>('07:00');
+  // Initialize with current time if not prefilled
+  const [bedTime, setBedTime] = useState<string>(
+    () => prefillBedTime || getCurrentTimeFormatted()
+  );
+  const [wakeTime, setWakeTime] = useState<string>(
+    () => prefillWakeTime || getCurrentTimeFormatted()
+  );
   const [rating, setRating] = useState<number>(4);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [mood, setMood] = useState<MoodLevel>(4);
@@ -46,10 +53,18 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
     if (prefillWakeTime) setWakeTime(prefillWakeTime);
   }, [prefillWakeTime]);
 
-  const durationInfo = calculateDuration(bedTime, wakeTime);
+  const isBedTimeValid = Boolean(bedTime && bedTime.trim() !== '' && bedTime.includes(':'));
+  const isWakeTimeValid = Boolean(wakeTime && wakeTime.trim() !== '' && wakeTime.includes(':'));
+  const isTimeValid = isBedTimeValid && isWakeTimeValid;
+
+  const durationInfo = isTimeValid
+    ? calculateDuration(bedTime, wakeTime)
+    : { totalMinutes: 0, formatted: 'กรุณาระบุเวลา', hours: 0, minutes: 0, cyclesEstimate: '-' };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isTimeValid) return;
 
     onAddRecord({
       date,
@@ -139,47 +154,79 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
 
           {/* Bedtime */}
           <div className="space-y-1.5">
-            <label
-              htmlFor="journal-bedtime"
-              className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
-            >
-              <Moon className="w-3.5 h-3.5 text-indigo-400" />
-              เวลาเข้านอน:
-            </label>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="journal-bedtime"
+                className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
+              >
+                <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                เวลาเข้านอน:
+              </label>
+              {!isBedTimeValid && (
+                <span className="text-[11px] text-rose-400 font-medium">* จำเป็น</span>
+              )}
+            </div>
             <input
               id="journal-bedtime"
               type="time"
               required
               value={bedTime}
               onChange={(e) => setBedTime(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+              className={`w-full bg-slate-950 border text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors ${
+                isBedTimeValid ? 'border-slate-700' : 'border-rose-500 bg-rose-950/20 ring-1 ring-rose-500/30'
+              }`}
             />
           </div>
 
           {/* Wake Time */}
           <div className="space-y-1.5">
-            <label
-              htmlFor="journal-waketime"
-              className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
-            >
-              <Sun className="w-3.5 h-3.5 text-amber-400" />
-              เวลาตื่นนอน:
-            </label>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="journal-waketime"
+                className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
+              >
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                เวลาตื่นนอน:
+              </label>
+              {!isWakeTimeValid && (
+                <span className="text-[11px] text-rose-400 font-medium">* จำเป็น</span>
+              )}
+            </div>
             <input
               id="journal-waketime"
               type="time"
               required
               value={wakeTime}
               onChange={(e) => setWakeTime(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+              className={`w-full bg-slate-950 border text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors ${
+                isWakeTimeValid ? 'border-slate-700' : 'border-rose-500 bg-rose-950/20'
+              }`}
             />
           </div>
         </div>
 
+        {/* Validation Warning if time is incomplete */}
+        {!isTimeValid && (
+          <div
+            id="error-journal-time-warning"
+            className="p-3 rounded-2xl bg-rose-950/50 border border-rose-500/40 text-rose-300 text-xs sm:text-sm flex items-center gap-2 animate-fade-in"
+          >
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span className="font-medium text-rose-400">กรุณาเลือกเวลาให้ครบถ้วน</span>
+            <span className="text-slate-300 text-xs">
+              (ระบุเวลาเข้านอนและเวลาตื่นนอนเพื่อคำนวณระยะเวลาและบันทึกข้อมูล)
+            </span>
+          </div>
+        )}
+
         {/* Auto Duration Pill Box */}
         <div
           id="duration-calculator-badge"
-          className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+          className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all ${
+            isTimeValid
+              ? 'bg-indigo-950/40 border-indigo-500/20'
+              : 'bg-slate-950/50 border-slate-800'
+          }`}
         >
           <div className="flex items-center gap-2 text-xs text-indigo-200">
             <Clock className="w-4 h-4 text-indigo-400" />
@@ -188,13 +235,19 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
           <div className="flex items-center gap-2">
             <span
               id="journal-calculated-hours"
-              className="text-sm font-bold text-white bg-indigo-600/30 px-3 py-1 rounded-lg border border-indigo-400/30"
+              className={`text-sm font-bold px-3 py-1 rounded-lg border ${
+                isTimeValid
+                  ? 'text-white bg-indigo-600/30 border-indigo-400/30'
+                  : 'text-slate-500 bg-slate-900 border-slate-800'
+              }`}
             >
               {durationInfo.formatted}
             </span>
-            <span className="text-xs text-indigo-300 font-medium">
-              ({durationInfo.cyclesEstimate})
-            </span>
+            {isTimeValid && (
+              <span className="text-xs text-indigo-300 font-medium">
+                ({durationInfo.cyclesEstimate})
+              </span>
+            )}
           </div>
         </div>
 
@@ -312,7 +365,8 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
         <button
           id="btn-save-sleep-record"
           type="submit"
-          className="w-full py-3 sm:py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-indigo-950/80 transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
+          disabled={!isTimeValid}
+          className="w-full py-3 sm:py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:border disabled:border-slate-700 disabled:cursor-not-allowed text-white font-semibold text-sm sm:text-base shadow-lg shadow-indigo-950/80 transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
         >
           <PlusCircle className="w-5 h-5" />
           <span>บันทึกข้อมูลการนอน</span>
@@ -321,3 +375,4 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
     </div>
   );
 };
+
