@@ -57,6 +57,8 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
   const isWakeTimeValid = Boolean(wakeTime && wakeTime.trim() !== '' && wakeTime.includes(':'));
   const isTimeValid = isBedTimeValid && isWakeTimeValid;
 
+  const isRestoredFromSaved = Boolean(prefillBedTime && prefillWakeTime);
+
   const durationInfo = isTimeValid
     ? calculateDuration(bedTime, wakeTime)
     : { totalMinutes: 0, formatted: 'กรุณาระบุเวลา', hours: 0, minutes: 0, cyclesEstimate: '-' };
@@ -117,6 +119,15 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
             จดบันทึกเวลา คุณภาพ และความรู้สึกหลังตื่นนอนเพื่อติดตามสุขภาพการนอน
           </p>
+          {isRestoredFromSaved && (
+            <div
+              id="restored-time-banner"
+              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-xs font-medium animate-fade-in"
+            >
+              <Clock className="w-3.5 h-3.5 text-indigo-400" />
+              <span>ดึงเวลาที่คุณเลือกไว้ล่าสุด: เข้านอน {bedTime} น. / ตื่น {wakeTime} น.</span>
+            </div>
+          )}
         </div>
 
         {showSavedFeedback && (

@@ -6,6 +6,7 @@ import { SleepJournalHistory } from './components/SleepJournalHistory';
 import { SleepRecord } from './types';
 
 const STORAGE_KEY = 'non_bang_sleep_journal_records_v1';
+const SAVED_SELECTED_TIME_KEY = 'non_bang_selected_sleep_time_v1';
 
 // Initial sample entries so the user immediately experiences the journal
 const INITIAL_SAMPLE_RECORDS: SleepRecord[] = [
@@ -48,8 +49,56 @@ export default function App() {
     }
   });
 
-  const [prefillBedTime, setPrefillBedTime] = useState<string | undefined>(undefined);
-  const [prefillWakeTime, setPrefillWakeTime] = useState<string | undefined>(undefined);
+  const [prefillBedTime, setPrefillBedTime] = useState<string | undefined>(() => {
+    try {
+      const savedTime = localStorage.getItem(SAVED_SELECTED_TIME_KEY);
+      if (savedTime) {
+        const parsed = JSON.parse(savedTime);
+        return parsed.bedTime;
+      }
+    } catch {
+      // fallback
+    }
+    return undefined;
+  });
+
+  const [prefillWakeTime, setPrefillWakeTime] = useState<string | undefined>(() => {
+    try {
+      const savedTime = localStorage.getItem(SAVED_SELECTED_TIME_KEY);
+      if (savedTime) {
+        const parsed = JSON.parse(savedTime);
+        return parsed.wakeTime;
+      }
+    } catch {
+      // fallback
+    }
+    return undefined;
+  });
+
+  // Check if we loaded a saved selected time on initial page load, and auto-scroll down to Sleep Journal
+  useEffect(() => {
+    try {
+      const savedTime = localStorage.getItem(SAVED_SELECTED_TIME_KEY);
+      if (savedTime) {
+        // Small delay to ensure DOM is ready and styled
+        const timer = setTimeout(() => {
+          const formElem = document.getElementById('sleep-journal-form-card');
+          if (formElem) {
+            formElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Focus note input for immediate writing if present
+            const noteInput = document.getElementById('journal-note');
+            if (noteInput) {
+              (noteInput as HTMLInputElement).focus({ preventScroll: true });
+            }
+          }
+        }, 400);
+
+        return () => clearTimeout(timer);
+      }
+    } catch (e) {
+      console.error('Failed to restore saved sleep time:', e);
+    }
+  }, []);
 
   // Save to localStorage whenever records change
   useEffect(() => {
@@ -72,6 +121,13 @@ export default function App() {
     // Prepend to list so newest is first
     setRecords((prev) => [newRecord, ...prev]);
 
+    // Clear the active prefilled time from localStorage after successful save
+    try {
+      localStorage.removeItem(SAVED_SELECTED_TIME_KEY);
+    } catch (e) {
+      console.error('Failed to clear saved selected time:', e);
+    }
+
     // Scroll smoothly to history if needed
     const historyElem = document.getElementById('sleep-journal-history-card');
     if (historyElem) {
@@ -91,10 +147,24 @@ export default function App() {
     setPrefillBedTime(bed);
     setPrefillWakeTime(wake);
 
-    // Scroll smoothly to form
+    // Save to localStorage for persistent state
+    try {
+      localStorage.setItem(
+        SAVED_SELECTED_TIME_KEY,
+        JSON.stringify({ bedTime: bed, wakeTime: wake, timestamp: Date.now() })
+      );
+    } catch (e) {
+      console.error('Failed to save selected sleep time to localStorage:', e);
+    }
+
+    // Scroll smoothly to form and focus note input
     const formElem = document.getElementById('sleep-journal-form-card');
     if (formElem) {
       formElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const noteInput = document.getElementById('journal-note');
+      if (noteInput) {
+        (noteInput as HTMLInputElement).focus({ preventScroll: true });
+      }
     }
   };
 
