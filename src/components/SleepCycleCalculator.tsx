@@ -141,7 +141,7 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
         }`}
       >
         {mode === 'wake' ? (
-          <div>
+          <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <label
                 htmlFor="input-bedtime"
@@ -151,14 +151,14 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                 เวลาที่จะเข้านอน:
               </label>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   id="btn-set-bedtime-now"
                   type="button"
                   onClick={handleSetNow}
-                  className="px-3 py-2 text-xs font-medium bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-200 rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-3 py-2 text-xs font-semibold bg-indigo-950/90 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-200 rounded-xl transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
                 >
-                  <Zap className="w-3.5 h-3.5 text-amber-300" />
+                  <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
                   นอนตอนนี้ ({getCurrentTimeFormatted()})
                 </button>
                 <input
@@ -172,6 +172,25 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                   }`}
                 />
               </div>
+            </div>
+
+            {/* Popular Bedtime Presets for all screens (no hidden classes) */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-[11px] text-slate-400 font-medium mr-1">เวลายอดนิยม:</span>
+              {['22:00', '23:00', '23:30', '00:00', '01:00'].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setInputBedTime(preset)}
+                  className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
+                    inputBedTime === preset
+                      ? 'bg-indigo-600/40 border-indigo-400/60 text-indigo-200 font-semibold shadow-sm'
+                      : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                  }`}
+                >
+                  {preset} น.
+                </button>
+              ))}
             </div>
 
             {isCurrentTimeValid ? (
@@ -189,7 +208,7 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
             )}
           </div>
         ) : (
-          <div>
+          <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <label
                 htmlFor="input-waketime"
@@ -199,23 +218,16 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                 เวลาที่ต้องการตื่นนอน:
               </label>
 
-              <div className="flex items-center gap-2">
-                <div className="hidden sm:flex items-center gap-1.5">
-                  {['06:00', '07:00', '08:00'].map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() => setInputWakeTime(preset)}
-                      className={`px-2.5 py-1.5 text-xs rounded-lg border transition-all ${
-                        inputWakeTime === preset
-                          ? 'bg-indigo-600/30 border-indigo-400/50 text-indigo-200 font-medium'
-                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      {preset}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  id="btn-set-waketime-now"
+                  type="button"
+                  onClick={handleSetNow}
+                  className="px-3 py-2 text-xs font-semibold bg-amber-950/90 hover:bg-amber-900 border border-amber-500/40 text-amber-200 rounded-xl transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                >
+                  <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                  ตื่นตอนนี้ ({getCurrentTimeFormatted()})
+                </button>
                 <input
                   id="input-waketime"
                   type="time"
@@ -227,6 +239,25 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
                   }`}
                 />
               </div>
+            </div>
+
+            {/* Popular Waketime Presets for all screens (no hidden classes) */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-[11px] text-slate-400 font-medium mr-1">เวลายอดนิยม:</span>
+              {['05:30', '06:00', '06:30', '07:00', '08:00'].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setInputWakeTime(preset)}
+                  className={`px-2.5 py-1 text-xs rounded-lg border transition-all ${
+                    inputWakeTime === preset
+                      ? 'bg-amber-500/30 border-amber-400/60 text-amber-200 font-semibold shadow-sm'
+                      : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                  }`}
+                >
+                  {preset} น.
+                </button>
+              ))}
             </div>
 
             {isCurrentTimeValid ? (
