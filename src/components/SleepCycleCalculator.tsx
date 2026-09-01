@@ -59,39 +59,38 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
   };
 
   return (
-    <section
-      id="sleep-calculator-section"
-      className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl"
-    >
-      {/* Title & Description */}
-      <div className="mb-5">
-        <h2
-          id="calculator-heading"
-          className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
-        >
-          <Clock className="w-6 h-6 text-purple-400" />
-          คำนวณรอบการนอน
-        </h2>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          นับรอบการนอน 90 นาที/รอบ + เผื่อเวลาเคลิ้มหลับ 15 นาที เพื่อให้คุณตื่นนอนได้อย่างสดชื่น
-        </p>
-      </div>
-
-      {/* Prominent Full-Width 2-Tab Mode Switcher */}
-      <div
-        id="calculator-mode-tabs-container"
-        className="w-full mb-6 p-1.5 bg-slate-950/90 rounded-2xl border border-slate-800 shadow-inner"
+    <div className="space-y-4">
+      {/* Block 1: Standalone Mode Selector Card */}
+      <section
+        id="mode-selector-card"
+        className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="flex items-center justify-between gap-2 mb-3 px-1">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <span className="text-xs sm:text-sm font-semibold text-slate-200">
+              เลือกรูปแบบการคำนวณเวลานอน
+            </span>
+          </div>
+          <span className="text-[11px] text-slate-400">
+            {mode === 'wake' ? 'โหมด: คำนวณเวลาตื่น' : 'โหมด: คำนวณเวลาเข้านอน'}
+          </span>
+        </div>
+
+        {/* 2 Full-Width Mode Switcher Buttons */}
+        <div
+          id="calculator-mode-tabs-container"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-1.5 bg-slate-950/90 rounded-2xl border border-slate-800/90 shadow-inner"
+        >
           {/* Tab 1: ตื่นกี่โมงดี */}
           <button
             id="tab-wake-mode"
             type="button"
             onClick={() => setMode('wake')}
-            className={`w-full py-3 sm:py-3.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 select-none ${
+            className={`w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 select-none ${
               mode === 'wake'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-950/80 border border-indigo-400/40 ring-2 ring-indigo-500/20'
-                : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-950/80 border border-indigo-400/40 ring-2 ring-indigo-500/20 scale-[1.01]'
+                : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/70 border border-transparent'
             }`}
           >
             <span className="text-base">🌙</span>
@@ -103,17 +102,36 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
             id="tab-bed-mode"
             type="button"
             onClick={() => setMode('bed')}
-            className={`w-full py-3 sm:py-3.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 select-none ${
+            className={`w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 select-none ${
               mode === 'bed'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-950/80 border border-indigo-400/40 ring-2 ring-indigo-500/20'
-                : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-950/80 border border-indigo-400/40 ring-2 ring-indigo-500/20 scale-[1.01]'
+                : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/70 border border-transparent'
             }`}
           >
             <span className="text-base">☀️</span>
             <span className="tracking-wide">เข้านอนกี่โมงดี? (ตื่นเวลานี้)</span>
           </button>
         </div>
-      </div>
+      </section>
+
+      {/* Block 2: Sleep Cycle Calculator Section */}
+      <section
+        id="sleep-calculator-section"
+        className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl"
+      >
+        {/* Title & Description */}
+        <div className="mb-6">
+          <h2
+            id="calculator-heading"
+            className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
+          >
+            <Clock className="w-6 h-6 text-purple-400" />
+            คำนวณรอบการนอน
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            นับรอบการนอน 90 นาที/รอบ + เผื่อเวลาเคลิ้มหลับ 15 นาที เพื่อให้คุณตื่นนอนได้อย่างสดชื่น
+          </p>
+        </div>
 
       {/* Input Form Box */}
       <div
@@ -363,6 +381,7 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
         )}
       </div>
     </section>
+  </div>
   );
 };
 
