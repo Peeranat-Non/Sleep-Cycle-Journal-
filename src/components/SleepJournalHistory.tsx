@@ -15,8 +15,13 @@ import { MOOD_OPTIONS } from '../constants/moods';
 import { MoodFaceIcon, MOOD_COLORS } from './MoodFaceIcon';
 import { formatThaiDate } from '../utils/sleepMath';
 import { ConfirmModal } from './ConfirmModal';
-import { SleepTrendsAndCalendar } from './SleepTrendsAndCalendar';
 import { useTheme } from '../context/ThemeContext';
+
+const SleepTrendsAndCalendar = React.lazy(() =>
+  import('./SleepTrendsAndCalendar').then((module) => ({
+    default: module.SleepTrendsAndCalendar,
+  }))
+);
 
 interface SleepJournalHistoryProps {
   records: SleepRecord[];
@@ -145,8 +150,25 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
         </div>
       )}
 
-      {/* Sleep Trends & Calendar Card (Unified Toggle View) */}
-      {records.length > 0 && <SleepTrendsAndCalendar records={records} />}
+      {/* Sleep Trends & Calendar Card (Unified Toggle View with Lazy Loading) */}
+      {records.length > 0 && (
+        <React.Suspense
+          fallback={
+            <div
+              className={`p-6 rounded-2xl border animate-pulse flex flex-col items-center justify-center min-h-[220px] ${
+                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}
+            >
+              <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mb-2" />
+              <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                กำลังโหลดสถิติและปฏิทิน...
+              </span>
+            </div>
+          }
+        >
+          <SleepTrendsAndCalendar records={records} />
+        </React.Suspense>
+      )}
 
       {/* List of Entries */}
       {records.length === 0 ? (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Sparkles, Star, Clock, Heart, Zap, Award } from 'lucide-react';
 import { SleepRecord, MoodLevel } from '../types';
 import { useTheme } from '../context/ThemeContext';
@@ -146,7 +146,7 @@ export const SleepAvatar: React.FC<SleepAvatarProps> = ({ records }) => {
     };
   };
 
-  const state = calculateAvatarState();
+  const state = useMemo(() => calculateAvatarState(), [records, isDark]);
 
   const handleAvatarClick = () => {
     setIsInteracting(true);

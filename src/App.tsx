@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { SleepCycleCalculator } from './components/SleepCycleCalculator';
 import { SleepJournalForm } from './components/SleepJournalForm';
@@ -112,41 +112,42 @@ function AppContent() {
     }
   }, [records]);
 
-  const handleAddRecord = (
-    newRecordData: Omit<SleepRecord, 'id' | 'createdAt'>
-  ) => {
-    const newRecord: SleepRecord = {
-      ...newRecordData,
-      id: 'record_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-      createdAt: Date.now(),
-    };
+  const handleAddRecord = useCallback(
+    (newRecordData: Omit<SleepRecord, 'id' | 'createdAt'>) => {
+      const newRecord: SleepRecord = {
+        ...newRecordData,
+        id: 'record_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        createdAt: Date.now(),
+      };
 
-    // Prepend to list so newest is first
-    setRecords((prev) => [newRecord, ...prev]);
+      // Prepend to list so newest is first
+      setRecords((prev) => [newRecord, ...prev]);
 
-    // Clear the active prefilled time from localStorage after successful save
-    try {
-      localStorage.removeItem(SAVED_SELECTED_TIME_KEY);
-    } catch (e) {
-      console.error('Failed to clear saved selected time:', e);
-    }
+      // Clear the active prefilled time from localStorage after successful save
+      try {
+        localStorage.removeItem(SAVED_SELECTED_TIME_KEY);
+      } catch (e) {
+        console.error('Failed to clear saved selected time:', e);
+      }
 
-    // Scroll smoothly to history if needed
-    const historyElem = document.getElementById('sleep-journal-history-card');
-    if (historyElem) {
-      historyElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  };
+      // Scroll smoothly to history if needed
+      const historyElem = document.getElementById('sleep-journal-history-card');
+      if (historyElem) {
+        historyElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    },
+    []
+  );
 
-  const handleDeleteRecord = (id: string) => {
+  const handleDeleteRecord = useCallback((id: string) => {
     setRecords((prev) => prev.filter((r) => r.id !== id));
-  };
+  }, []);
 
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     setRecords([]);
-  };
+  }, []);
 
-  const handleSelectTimeToJournal = (bed: string, wake: string) => {
+  const handleSelectTimeToJournal = useCallback((bed: string, wake: string) => {
     setPrefillBedTime(bed);
     setPrefillWakeTime(wake);
 
@@ -169,7 +170,7 @@ function AppContent() {
         (noteInput as HTMLInputElement).focus({ preventScroll: true });
       }
     }
-  };
+  }, []);
 
   return (
     <div

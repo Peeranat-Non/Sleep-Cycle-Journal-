@@ -98,22 +98,30 @@
 
 .animate-fade-in {
   animation: fadeIn 0.25s ease-out forwards;
+  will-change: opacity, transform;
 }
 
 .animate-avatar-float {
   animation: avatarFloat 3.5s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .animate-avatar-blink {
   animation: avatarBlink 4s ease-in-out infinite;
   transform-origin: center;
+  will-change: transform;
 }
 
 .animate-float-zzz {
   animation: floatZzz 2.8s ease-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .animate-gentle-wiggle {
   animation: gentleWiggle 2s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 

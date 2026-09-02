@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Moon, Sun, Clock, Sparkles, ArrowRight, Check, Zap, AlertCircle } from 'lucide-react';
 import { CalculatorMode, CycleResult } from '../types';
 import {
@@ -36,11 +36,12 @@ export const SleepCycleCalculator: React.FC<SleepCycleCalculatorProps> = ({
       ? Boolean(inputBedTime && inputBedTime.trim() !== '' && inputBedTime.includes(':'))
       : Boolean(inputWakeTime && inputWakeTime.trim() !== '' && inputWakeTime.includes(':'));
 
-  const results: CycleResult[] = isCurrentTimeValid
-    ? mode === 'wake'
+  const results: CycleResult[] = useMemo(() => {
+    if (!isCurrentTimeValid) return [];
+    return mode === 'wake'
       ? calculateWakeTimes(inputBedTime)
-      : calculateBedTimes(inputWakeTime)
-    : [];
+      : calculateBedTimes(inputWakeTime);
+  }, [isCurrentTimeValid, mode, inputBedTime, inputWakeTime]);
 
   const handleApplyToJournal = (result: CycleResult) => {
     if (!onSelectTimeToJournal || !isCurrentTimeValid) return;
