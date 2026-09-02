@@ -117,19 +117,39 @@ export function calculateDuration(bedTimeStr: string, wakeTimeStr: string): {
   hours: number;
   minutes: number;
   cyclesEstimate: string;
+  isSameTime: boolean;
 } {
   const [bedH, bedM] = bedTimeStr.split(':').map(Number);
   const [wakeH, wakeM] = wakeTimeStr.split(':').map(Number);
 
   if (isNaN(bedH) || isNaN(bedM) || isNaN(wakeH) || isNaN(wakeM)) {
-    return { totalMinutes: 0, formatted: '0 ชม. 0 นาที', hours: 0, minutes: 0, cyclesEstimate: '0 รอบ' };
+    return {
+      totalMinutes: 0,
+      formatted: '0 ชม. 0 นาที',
+      hours: 0,
+      minutes: 0,
+      cyclesEstimate: '0 รอบ',
+      isSameTime: false,
+    };
   }
 
   const bedTotal = bedH * 60 + bedM;
   const wakeTotal = wakeH * 60 + wakeM;
 
+  // If bedtime and wake time are identical, duration is 0 (NOT 24 hours)
+  if (bedTotal === wakeTotal) {
+    return {
+      totalMinutes: 0,
+      formatted: '0 ชม. 0 นาที',
+      hours: 0,
+      minutes: 0,
+      cyclesEstimate: '0 รอบ',
+      isSameTime: true,
+    };
+  }
+
   let diff = wakeTotal - bedTotal;
-  if (diff <= 0) {
+  if (diff < 0) {
     diff += 24 * 60; // crossed midnight
   }
 
@@ -144,6 +164,7 @@ export function calculateDuration(bedTimeStr: string, wakeTimeStr: string): {
     hours,
     minutes,
     cyclesEstimate: `~${cycles} รอบการนอน`,
+    isSameTime: false,
   };
 }
 
