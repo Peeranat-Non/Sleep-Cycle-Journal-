@@ -12,9 +12,10 @@ import {
 } from 'lucide-react';
 import { SleepRecord } from '../types';
 import { MOOD_OPTIONS } from '../constants/moods';
+import { MoodFaceIcon, MOOD_COLORS } from './MoodFaceIcon';
 import { formatThaiDate } from '../utils/sleepMath';
 import { ConfirmModal } from './ConfirmModal';
-import { SleepTrendsChart } from './SleepTrendsChart';
+import { SleepTrendsAndCalendar } from './SleepTrendsAndCalendar';
 import { useTheme } from '../context/ThemeContext';
 
 interface SleepJournalHistoryProps {
@@ -144,8 +145,8 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
         </div>
       )}
 
-      {/* Sleep Trends Chart (Visualizing duration + ratings) */}
-      {records.length > 0 && <SleepTrendsChart records={records} />}
+      {/* Sleep Trends & Calendar Card (Unified Toggle View) */}
+      {records.length > 0 && <SleepTrendsAndCalendar records={records} />}
 
       {/* List of Entries */}
       {records.length === 0 ? (
@@ -276,9 +277,20 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
                       </div>
 
                       {/* Mood Badge */}
-                      <div className={`inline-flex items-center gap-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
-                        <span className="text-lg leading-none">{moodData.emoji}</span>
-                        <span className={`font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                      <div
+                        className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full border shadow-2xs"
+                        style={{
+                          backgroundColor: `${MOOD_COLORS[record.mood || 3]?.hex || '#10B981'}15`,
+                          borderColor: `${MOOD_COLORS[record.mood || 3]?.hex || '#10B981'}40`,
+                        }}
+                      >
+                        <MoodFaceIcon mood={record.mood} size={18} />
+                        <span
+                          className="font-semibold"
+                          style={{
+                            color: MOOD_COLORS[record.mood || 3]?.hex,
+                          }}
+                        >
                           {moodData.label}
                         </span>
                       </div>

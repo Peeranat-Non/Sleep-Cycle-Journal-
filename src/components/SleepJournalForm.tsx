@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { MoodLevel, SleepRecord } from '../types';
 import { MOOD_OPTIONS } from '../constants/moods';
+import { MoodFaceIcon, MoodSpectrumBar, MOOD_COLORS } from './MoodFaceIcon';
 import {
   calculateDuration,
   getTodayDateFormatted,
@@ -509,49 +510,85 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
           </div>
         </div>
 
-        {/* Row 3: Wake Mood Selection (5 Emojis) */}
-        <div className="space-y-2">
-          <label
-            id="label-wake-mood"
-            className={`text-xs font-medium flex items-center gap-1.5 ${
-              isDark ? 'text-slate-300' : 'text-slate-700'
-            }`}
-          >
-            <Smile className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-            อารมณ์/ความรู้สึกตอนตื่น (เลือก 1 แบบ):
-          </label>
+        {/* Row 3: Wake Mood Selection (5 Colored Faces matching exact reference image) */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <label
+              id="label-wake-mood"
+              className={`text-xs font-medium flex items-center gap-1.5 ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}
+            >
+              <Smile className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              อารมณ์/ความรู้สึกตอนตื่น (เฉดสีตามระดับความสดชื่น):
+            </label>
+            <span
+              className="text-xs font-semibold px-2 py-0.5 rounded-md"
+              style={{
+                color: MOOD_COLORS[mood].hex,
+                backgroundColor: `${MOOD_COLORS[mood].hex}18`,
+              }}
+            >
+              {MOOD_COLORS[mood].label}
+            </span>
+          </div>
 
+          {/* 5 Facial Mood Buttons */}
           <div
             id="mood-emoji-selector"
             className="grid grid-cols-5 gap-1.5 sm:gap-3"
           >
             {MOOD_OPTIONS.map((item) => {
               const isSelected = mood === item.value;
+              const moodInfo = MOOD_COLORS[item.value];
               return (
                 <button
                   key={item.value}
                   id={`btn-mood-${item.value}`}
                   type="button"
                   onClick={() => setMood(item.value)}
-                  className={`flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-2xl border transition-all min-h-[66px] sm:min-h-[76px] active:scale-95 ${
+                  className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-2xl border transition-all min-h-[72px] sm:min-h-[84px] active:scale-95 ${
                     isSelected
                       ? isDark
-                        ? 'bg-indigo-600/20 border-indigo-400 text-white shadow-md shadow-indigo-950/60 scale-[1.02] ring-1 ring-indigo-400'
-                        : 'bg-indigo-50 border-indigo-500 text-indigo-950 shadow-md shadow-indigo-100 scale-[1.02] ring-1 ring-indigo-500 font-semibold'
+                        ? 'bg-slate-900 border-2 shadow-lg scale-[1.03]'
+                        : 'bg-white border-2 shadow-md scale-[1.03]'
                       : isDark
-                      ? 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-900'
-                      : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50'
+                      ? 'bg-slate-950/60 border-slate-800/80 hover:bg-slate-900/60 hover:border-slate-700 opacity-80 hover:opacity-100'
+                      : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300 opacity-80 hover:opacity-100'
                   }`}
+                  style={{
+                    borderColor: isSelected ? moodInfo.hex : undefined,
+                    boxShadow: isSelected ? `0 4px 14px -2px ${moodInfo.hex}40` : undefined,
+                  }}
                 >
-                  <span className="text-xl sm:text-3xl mb-1 filter drop-shadow-xs select-none">
-                    {item.emoji}
-                  </span>
-                  <span className="text-[10px] sm:text-xs font-medium text-center leading-tight break-words px-0.5">
+                  <div className="mb-1.5 transition-transform">
+                    <MoodFaceIcon
+                      mood={item.value}
+                      size={34}
+                      animate={isSelected}
+                    />
+                  </div>
+                  <span
+                    className={`text-[10px] sm:text-xs font-medium text-center leading-tight break-words px-0.5 ${
+                      isSelected ? 'font-bold' : isDark ? 'text-slate-400' : 'text-slate-600'
+                    }`}
+                    style={{
+                      color: isSelected ? moodInfo.hex : undefined,
+                    }}
+                  >
                     {item.label}
                   </span>
                 </button>
               );
             })}
+          </div>
+
+          {/* Color Spectrum Indicator Bar matching reference image */}
+          <div className="pt-1 px-1">
+            <MoodSpectrumBar
+              selectedMood={mood}
+              onSelectMood={(lvl) => setMood(lvl)}
+            />
           </div>
         </div>
 

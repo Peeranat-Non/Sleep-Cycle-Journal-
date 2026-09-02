@@ -173,7 +173,7 @@ function AppContent() {
 
   return (
     <div
-      className={`min-h-screen pb-16 transition-colors duration-300 selection:bg-indigo-500 selection:text-white ${
+      className={`min-h-screen pb-16 w-full max-w-full overflow-x-hidden transition-colors duration-300 selection:bg-indigo-500 selection:text-white ${
         isDark
           ? 'bg-slate-950 text-slate-100'
           : 'bg-slate-100 text-slate-800'
