@@ -19,6 +19,7 @@ import {
   getTodayDateFormatted,
   getCurrentTimeFormatted,
 } from '../utils/sleepMath';
+import { useTheme } from '../context/ThemeContext';
 
 interface SleepJournalFormProps {
   onAddRecord: (record: Omit<SleepRecord, 'id' | 'createdAt'>) => void;
@@ -31,6 +32,7 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
   prefillBedTime,
   prefillWakeTime,
 }) => {
+  const { isDark } = useTheme();
   const [date, setDate] = useState<string>(getTodayDateFormatted());
   
   // Track if a valid selection from the 4 recommendation cards has been made
@@ -179,26 +181,36 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
   return (
     <div
       id="sleep-journal-form-card"
-      className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl space-y-5"
+      className={`backdrop-blur-md rounded-3xl p-5 sm:p-7 shadow-xl space-y-5 border transition-colors duration-300 ${
+        isDark
+          ? 'bg-slate-900/80 border-slate-800'
+          : 'bg-white/95 border-slate-200 shadow-slate-200'
+      }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2
             id="journal-form-heading"
-            className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
+            className={`text-xl sm:text-2xl font-bold flex items-center gap-2.5 ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}
           >
-            <Sparkles className="w-6 h-6 text-amber-300" />
+            <Sparkles className="w-6 h-6 text-amber-400" />
             บันทึกการนอน (Sleep Journal)
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             จดบันทึกเวลา คุณภาพ และความรู้สึกหลังตื่นนอนเพื่อติดตามสุขภาพการนอน (สามารถปรับเปลี่ยนเวลาเข้านอนและเวลาตื่นนอนให้ตรงกับความเป็นจริงได้)
           </p>
           {hasSelectedFromCards && !isSameTime && (
             <div
               id="restored-time-banner"
-              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-xs font-medium animate-fade-in"
+              className={`mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-medium animate-fade-in border ${
+                isDark
+                  ? 'bg-indigo-500/20 border-indigo-400/40 text-indigo-300'
+                  : 'bg-indigo-50 border-indigo-200 text-indigo-700'
+              }`}
             >
-              <Clock className="w-3.5 h-3.5 text-indigo-400" />
+              <Clock className="w-3.5 h-3.5 text-indigo-500" />
               <span>ดึงเวลาที่คุณเลือกจาก 4 ตัวเลือก: เข้านอน {bedTime} น. / ตื่น {wakeTime} น.</span>
             </div>
           )}
@@ -207,9 +219,13 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
         {showSavedFeedback && (
           <div
             id="save-success-badge"
-            className="px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium flex items-center gap-1.5 animate-fade-in self-start sm:self-auto"
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 animate-fade-in self-start sm:self-auto border ${
+              isDark
+                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                : 'bg-emerald-50 border-emerald-300 text-emerald-800'
+            }`}
           >
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             <span>บันทึกสำเร็จ!</span>
           </div>
         )}
@@ -219,20 +235,34 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
       {(!hasSelectedFromCards || isSameTime || alertError) && (
         <div
           id="form-validation-alert-box"
-          className="p-4 rounded-2xl bg-rose-950/70 border-2 border-rose-500/80 text-rose-200 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg shadow-rose-950/50 animate-fade-in"
+          className={`p-4 rounded-2xl border-2 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg animate-fade-in ${
+            isDark
+              ? 'bg-rose-950/70 border-rose-500/80 text-rose-200 shadow-rose-950/50'
+              : 'bg-rose-50 border-rose-300 text-rose-800 shadow-rose-100'
+          }`}
         >
           <div className="flex items-start gap-2.5">
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <div className="font-bold text-rose-300 text-sm sm:text-base flex items-center gap-2">
+              <div
+                className={`font-bold text-sm sm:text-base flex items-center gap-2 ${
+                  isDark ? 'text-rose-300' : 'text-rose-900'
+                }`}
+              >
                 <span>กรุณาเลือกเวลาจาก 4 ตัวเลือกก่อน</span>
                 {isSameTime && (
-                  <span className="text-xs font-normal text-rose-300 bg-rose-900/60 px-2 py-0.5 rounded-full border border-rose-500/40">
+                  <span
+                    className={`text-xs font-normal px-2 py-0.5 rounded-full border ${
+                      isDark
+                        ? 'text-rose-300 bg-rose-900/60 border-rose-500/40'
+                        : 'text-rose-800 bg-rose-100 border-rose-300'
+                    }`}
+                  >
                     เวลาเข้านอนและตื่นนอนเป็นเวลาเดียวกัน
                   </span>
                 )}
               </div>
-              <p className="text-xs text-rose-300/90 leading-relaxed">
+              <p className={`text-xs leading-relaxed ${isDark ? 'text-rose-300/90' : 'text-rose-700'}`}>
                 ระบบคำนวณจะไม่บันทึกเวลาที่ซ้ำกัน และต้องเลือกเวลาที่แนะนำจากตัวเลือก 4 ชุดด้านบนเพื่อความถูกต้องของรอบการนอน
               </p>
             </div>
@@ -242,9 +272,13 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
             id="btn-alert-go-select-card"
             type="button"
             onClick={scrollToCalculatorCards}
-            className="px-4 py-2 rounded-xl bg-rose-500/30 hover:bg-rose-500/40 border border-rose-400/60 text-rose-100 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm active:scale-95"
+            className={`w-full sm:w-auto px-4 py-2.5 rounded-xl border font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-xs active:scale-95 min-h-[40px] ${
+              isDark
+                ? 'bg-rose-500/30 hover:bg-rose-500/40 border-rose-400/60 text-rose-100'
+                : 'bg-rose-600 hover:bg-rose-700 border-rose-600 text-white'
+            }`}
           >
-            <ArrowUpCircle className="w-4 h-4 text-rose-300" />
+            <ArrowUpCircle className="w-4 h-4 shrink-0" />
             <span>เลือกเวลาจาก 4 ตัวเลือก</span>
           </button>
         </div>
@@ -257,9 +291,11 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
           <div className="space-y-1.5">
             <label
               htmlFor="journal-date"
-              className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
+              className={`text-xs font-medium flex items-center gap-1.5 ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}
             >
-              <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+              <Calendar className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
               วันที่บันทึก:
             </label>
             <input
@@ -268,7 +304,11 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+              className={`w-full rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none border transition-colors min-h-[44px] ${
+                isDark
+                  ? 'bg-slate-950 border-slate-700 text-white'
+                  : 'bg-white border-slate-300 text-slate-900'
+              }`}
             />
           </div>
 
@@ -277,13 +317,15 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
             <div className="flex items-center justify-between">
               <label
                 htmlFor="journal-bedtime"
-                className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
+                className={`text-xs font-medium flex items-center gap-1.5 ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}
               >
-                <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                <Moon className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                 เวลาเข้านอน:
               </label>
               {isSameTime && (
-                <span className="text-[11px] text-rose-400 font-bold">* เวลาซ้ำ</span>
+                <span className="text-[11px] text-rose-500 font-bold">* เวลาซ้ำ</span>
               )}
             </div>
             <input
@@ -292,12 +334,18 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
               required
               value={bedTime}
               onChange={(e) => handleBedTimeChange(e.target.value)}
-              className={`w-full bg-slate-950 border text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors ${
+              className={`w-full rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors border min-h-[44px] ${
                 isSameTime
-                  ? 'border-rose-500 bg-rose-950/30 ring-2 ring-rose-500/40 text-rose-200'
+                  ? isDark
+                    ? 'bg-rose-950/30 border-rose-500 ring-2 ring-rose-500/40 text-rose-200'
+                    : 'bg-rose-50 border-rose-500 ring-2 ring-rose-500/40 text-rose-900'
+                  : isDark
+                  ? isBedTimeValid
+                    ? 'bg-slate-950 border-slate-700 text-white'
+                    : 'bg-rose-950/20 border-rose-500 text-white'
                   : isBedTimeValid
-                  ? 'border-slate-700'
-                  : 'border-rose-500 bg-rose-950/20'
+                  ? 'bg-white border-slate-300 text-slate-900'
+                  : 'bg-rose-50 border-rose-500 text-slate-900'
               }`}
             />
           </div>
@@ -307,13 +355,15 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
             <div className="flex items-center justify-between">
               <label
                 htmlFor="journal-waketime"
-                className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
+                className={`text-xs font-medium flex items-center gap-1.5 ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}
               >
-                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <Sun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 เวลาตื่นนอน:
               </label>
               {isSameTime && (
-                <span className="text-[11px] text-rose-400 font-bold">* เวลาซ้ำ</span>
+                <span className="text-[11px] text-rose-500 font-bold">* เวลาซ้ำ</span>
               )}
             </div>
             <input
@@ -322,12 +372,18 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
               required
               value={wakeTime}
               onChange={(e) => handleWakeTimeChange(e.target.value)}
-              className={`w-full bg-slate-950 border text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors ${
+              className={`w-full rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-colors border min-h-[44px] ${
                 isSameTime
-                  ? 'border-rose-500 bg-rose-950/30 ring-2 ring-rose-500/40 text-rose-200'
+                  ? isDark
+                    ? 'bg-rose-950/30 border-rose-500 ring-2 ring-rose-500/40 text-rose-200'
+                    : 'bg-rose-50 border-rose-500 ring-2 ring-rose-500/40 text-rose-900'
+                  : isDark
+                  ? isWakeTimeValid
+                    ? 'bg-slate-950 border-slate-700 text-white'
+                    : 'bg-rose-950/20 border-rose-500 text-white'
                   : isWakeTimeValid
-                  ? 'border-slate-700'
-                  : 'border-rose-500 bg-rose-950/20'
+                  ? 'bg-white border-slate-300 text-slate-900'
+                  : 'bg-rose-50 border-rose-500 text-slate-900'
               }`}
             />
           </div>
@@ -336,11 +392,15 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
         {/* Helper tip: Can customize bedtime and waketime to match reality */}
         <div
           id="time-adjustment-tip"
-          className="flex items-start sm:items-center gap-2 px-3.5 py-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/25 text-indigo-200 text-xs"
+          className={`flex items-start sm:items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs border transition-colors ${
+            isDark
+              ? 'bg-indigo-950/30 border-indigo-500/25 text-indigo-200'
+              : 'bg-indigo-50 border-indigo-200 text-indigo-800'
+          }`}
         >
-          <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5 sm:mt-0" />
-          <span>
-            <strong className="text-indigo-300">💡 ข้อแนะนำ:</strong> คุณสามารถกดคลิกเพื่อปรับเปลี่ยนเวลาเข้านอนและเวลาตื่นนอนในช่องด้านบนได้ตลอดเวลา เพื่อให้บันทึกตรงกับเวลาที่คุณเข้านอนและตื่นจริง
+          <Sparkles className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5 sm:mt-0" />
+          <span className="leading-relaxed">
+            <strong className={isDark ? 'text-indigo-300' : 'text-indigo-900'}>💡 ข้อแนะนำ:</strong> คุณสามารถกดคลิกเพื่อปรับเปลี่ยนเวลาเข้านอนและเวลาตื่นนอนในช่องด้านบนได้ตลอดเวลา เพื่อให้บันทึกตรงกับเวลาที่คุณเข้านอนและตื่นจริง
           </span>
         </div>
 
@@ -349,35 +409,47 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
           id="duration-calculator-badge"
           className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all ${
             isSameTime
-              ? 'bg-rose-950/40 border-rose-500/40'
+              ? isDark
+                ? 'bg-rose-950/40 border-rose-500/40'
+                : 'bg-rose-50 border-rose-300'
               : isFormValid
-              ? 'bg-indigo-950/40 border-indigo-500/20'
-              : 'bg-slate-950/50 border-slate-800'
+              ? isDark
+                ? 'bg-indigo-950/40 border-indigo-500/20'
+                : 'bg-indigo-50/70 border-indigo-200'
+              : isDark
+              ? 'bg-slate-950/50 border-slate-800'
+              : 'bg-slate-50 border-slate-200'
           }`}
         >
-          <div className="flex items-center gap-2 text-xs text-indigo-200">
-            <Clock className="w-4 h-4 text-indigo-400" />
+          <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-indigo-200' : 'text-indigo-800'}`}>
+            <Clock className="w-4 h-4 text-indigo-500 shrink-0" />
             <span>คำนวณชั่วโมงการนอนอัตโนมัติ:</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span
               id="journal-calculated-hours"
               className={`text-sm font-bold px-3 py-1 rounded-lg border ${
                 isSameTime
-                  ? 'text-rose-300 bg-rose-900/40 border-rose-500/40'
+                  ? isDark
+                    ? 'text-rose-300 bg-rose-900/40 border-rose-500/40'
+                    : 'text-rose-800 bg-rose-100 border-rose-300'
                   : isFormValid
-                  ? 'text-white bg-indigo-600/30 border-indigo-400/30'
-                  : 'text-slate-500 bg-slate-900 border-slate-800'
+                  ? isDark
+                    ? 'text-white bg-indigo-600/30 border-indigo-400/30'
+                    : 'text-indigo-950 bg-indigo-100 border-indigo-300'
+                  : isDark
+                  ? 'text-slate-500 bg-slate-900 border-slate-800'
+                  : 'text-slate-400 bg-slate-100 border-slate-200'
               }`}
             >
               {durationInfo.formatted}
             </span>
             {isSameTime ? (
-              <span className="text-xs text-rose-400 font-semibold">
+              <span className="text-xs text-rose-500 font-semibold">
                 (เวลาซ้ำกัน = 0 ชม.)
               </span>
             ) : isFormValid ? (
-              <span className="text-xs text-indigo-300 font-medium">
+              <span className={`text-xs font-medium ${isDark ? 'text-indigo-300' : 'text-indigo-700'}`}>
                 ({durationInfo.cyclesEstimate})
               </span>
             ) : null}
@@ -389,19 +461,23 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
           <div className="flex items-center justify-between">
             <label
               id="label-quality-rating"
-              className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
+              className={`text-xs font-medium flex items-center gap-1.5 ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}
             >
-              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
               คุณภาพการนอน (1 - 5 ดาว):
             </label>
-            <span className="text-xs text-amber-300 font-medium">
+            <span className={`text-xs font-medium ${isDark ? 'text-amber-300' : 'text-amber-700'}`}>
               {getRatingLabel(hoverRating ?? rating)}
             </span>
           </div>
 
           <div
             id="star-rating-selector"
-            className="flex items-center gap-2 p-3 bg-slate-950/60 border border-slate-800 rounded-2xl"
+            className={`flex items-center justify-between sm:justify-start gap-1 sm:gap-3 p-3 rounded-2xl border transition-colors ${
+              isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}
           >
             {[1, 2, 3, 4, 5].map((starNum) => {
               const isFilled = (hoverRating ?? rating) >= starNum;
@@ -413,14 +489,18 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
                   onClick={() => setRating(starNum)}
                   onMouseEnter={() => setHoverRating(starNum)}
                   onMouseLeave={() => setHoverRating(null)}
-                  className="p-2 sm:p-2.5 rounded-xl hover:bg-slate-800 transition-transform active:scale-90"
+                  className={`p-2 sm:p-2.5 rounded-xl transition-transform active:scale-90 min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                    isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-200'
+                  }`}
                   aria-label={`Rate ${starNum} stars`}
                 >
                   <Star
                     className={`w-6 h-6 sm:w-7 sm:h-7 transition-all ${
                       isFilled
                         ? 'text-amber-400 fill-amber-400 scale-110 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
-                        : 'text-slate-600'
+                        : isDark
+                        ? 'text-slate-700'
+                        : 'text-slate-300'
                     }`}
                   />
                 </button>
@@ -433,15 +513,17 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
         <div className="space-y-2">
           <label
             id="label-wake-mood"
-            className="text-xs font-medium text-slate-300 flex items-center gap-1.5"
+            className={`text-xs font-medium flex items-center gap-1.5 ${
+              isDark ? 'text-slate-300' : 'text-slate-700'
+            }`}
           >
-            <Smile className="w-3.5 h-3.5 text-emerald-400" />
+            <Smile className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             อารมณ์/ความรู้สึกตอนตื่น (เลือก 1 แบบ):
           </label>
 
           <div
             id="mood-emoji-selector"
-            className="grid grid-cols-5 gap-2 sm:gap-3"
+            className="grid grid-cols-5 gap-1.5 sm:gap-3"
           >
             {MOOD_OPTIONS.map((item) => {
               const isSelected = mood === item.value;
@@ -451,16 +533,20 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
                   id={`btn-mood-${item.value}`}
                   type="button"
                   onClick={() => setMood(item.value)}
-                  className={`flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl border transition-all ${
+                  className={`flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-2xl border transition-all min-h-[66px] sm:min-h-[76px] active:scale-95 ${
                     isSelected
-                      ? 'bg-indigo-600/20 border-indigo-400 text-white shadow-md shadow-indigo-950/60 scale-[1.02] ring-1 ring-indigo-400'
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+                      ? isDark
+                        ? 'bg-indigo-600/20 border-indigo-400 text-white shadow-md shadow-indigo-950/60 scale-[1.02] ring-1 ring-indigo-400'
+                        : 'bg-indigo-50 border-indigo-500 text-indigo-950 shadow-md shadow-indigo-100 scale-[1.02] ring-1 ring-indigo-500 font-semibold'
+                      : isDark
+                      ? 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+                      : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
-                  <span className="text-2xl sm:text-3xl mb-1 filter drop-shadow-sm select-none">
+                  <span className="text-xl sm:text-3xl mb-1 filter drop-shadow-xs select-none">
                     {item.emoji}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-medium text-center whitespace-nowrap">
+                  <span className="text-[10px] sm:text-xs font-medium text-center leading-tight break-words px-0.5">
                     {item.label}
                   </span>
                 </button>
@@ -472,12 +558,21 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
         {/* Row 4: Short Note (max 100 chars) */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <label htmlFor="journal-note" className="font-medium text-slate-300">
+            <label
+              htmlFor="journal-note"
+              className={`font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
+            >
               โน้ตสั้นๆ เกี่ยวกับการนอน:
             </label>
             <span
               className={`text-[11px] ${
-                note.length >= 90 ? 'text-amber-400 font-bold' : 'text-slate-400'
+                note.length >= 90
+                  ? isDark
+                    ? 'text-amber-400 font-bold'
+                    : 'text-amber-600 font-bold'
+                  : isDark
+                  ? 'text-slate-400'
+                  : 'text-slate-500'
               }`}
             >
               {note.length} / 100 ตัวอักษร
@@ -490,7 +585,11 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="เช่น ดื่มชาคาโมมายล์ก่อนนอน, ฝันดี, ตื่นมาออกกำลังกาย"
-            className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-sm placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+            className={`w-full rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 border transition-colors min-h-[44px] ${
+              isDark
+                ? 'bg-slate-950 border-slate-700 text-white placeholder-slate-500'
+                : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+            }`}
           />
         </div>
 
@@ -500,15 +599,15 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
             id="btn-save-sleep-record"
             type="submit"
             disabled={!isFormValid}
-            className="w-full py-3 sm:py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:border disabled:border-slate-700/80 disabled:cursor-not-allowed text-white font-semibold text-sm sm:text-base shadow-lg shadow-indigo-950/80 transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
+            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:from-slate-300 disabled:to-slate-300 dark:disabled:from-slate-800 dark:disabled:to-slate-800 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:border disabled:border-slate-200 dark:disabled:border-slate-700/80 disabled:cursor-not-allowed text-white font-semibold text-sm sm:text-base shadow-lg shadow-indigo-950/20 transition-all flex items-center justify-center gap-2 active:scale-[0.99] min-h-[48px]"
           >
-            <PlusCircle className="w-5 h-5" />
+            <PlusCircle className="w-5 h-5 shrink-0" />
             <span>บันทึกข้อมูลการนอน</span>
           </button>
 
           {!isFormValid && (
-            <p className="text-center text-xs text-rose-400 font-medium flex items-center justify-center gap-1 pt-1">
-              <AlertCircle className="w-3.5 h-3.5" />
+            <p className="text-center text-xs text-rose-500 font-medium flex items-center justify-center gap-1 pt-1">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>กรุณาเลือกเวลาจาก 4 ตัวเลือกก่อนเพื่อเปิดใช้งานปุ่มบันทึก</span>
             </p>
           )}
@@ -517,5 +616,3 @@ export const SleepJournalForm: React.FC<SleepJournalFormProps> = ({
     </div>
   );
 };
-
-

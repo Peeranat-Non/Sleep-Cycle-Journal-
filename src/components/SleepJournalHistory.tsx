@@ -7,9 +7,6 @@ import {
   Star,
   Clock,
   Calendar,
-  Sparkles,
-  Smile,
-  AlertCircle,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -18,6 +15,7 @@ import { MOOD_OPTIONS } from '../constants/moods';
 import { formatThaiDate } from '../utils/sleepMath';
 import { ConfirmModal } from './ConfirmModal';
 import { SleepTrendsChart } from './SleepTrendsChart';
+import { useTheme } from '../context/ThemeContext';
 
 interface SleepJournalHistoryProps {
   records: SleepRecord[];
@@ -32,6 +30,7 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
   onDeleteRecord,
   onClearAll,
 }) => {
+  const { isDark } = useTheme();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [showClearAllModal, setShowClearAllModal] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -74,18 +73,24 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
   return (
     <div
       id="sleep-journal-history-card"
-      className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl space-y-6"
+      className={`backdrop-blur-md rounded-3xl p-5 sm:p-7 shadow-xl space-y-6 border transition-colors duration-300 ${
+        isDark
+          ? 'bg-slate-900/80 border-slate-800'
+          : 'bg-white/95 border-slate-200 shadow-slate-200'
+      }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2
             id="journal-history-heading"
-            className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5"
+            className={`text-xl sm:text-2xl font-bold flex items-center gap-2.5 ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}
           >
-            <History className="w-6 h-6 text-indigo-400" />
+            <History className="w-6 h-6 text-indigo-500" />
             ประวัติการนอนที่บันทึก
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             เรียงลำดับจากล่าสุดไปเก่าสุด ({records.length} รายการ)
           </p>
         </div>
@@ -95,7 +100,11 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
             id="btn-clear-all-history"
             type="button"
             onClick={() => setShowClearAllModal(true)}
-            className="self-start sm:self-auto px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95"
+            className={`self-start sm:self-auto px-3.5 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95 border ${
+              isDark
+                ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border-rose-500/30'
+                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
+            }`}
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>ล้างประวัติทั้งหมด</span>
@@ -107,23 +116,27 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
       {records.length > 0 && (
         <div
           id="history-stats-bar"
-          className="grid grid-cols-3 gap-2.5 p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800"
+          className={`grid grid-cols-3 gap-2.5 p-3.5 rounded-2xl border transition-colors ${
+            isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+          }`}
         >
-          <div className="text-center p-2 rounded-xl bg-slate-900/50">
-            <span className="text-[11px] text-slate-400 block">บันทึกทั้งหมด</span>
-            <span className="text-base sm:text-lg font-bold text-white">
+          <div className={`text-center p-2 rounded-xl ${isDark ? 'bg-slate-900/50' : 'bg-white shadow-xs'}`}>
+            <span className={`text-[11px] block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>บันทึกทั้งหมด</span>
+            <span className={`text-base sm:text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
               {totalEntries} วัน
             </span>
           </div>
-          <div className="text-center p-2 rounded-xl bg-slate-900/50">
-            <span className="text-[11px] text-slate-400 block">เฉลี่ยต่อคืน</span>
-            <span className="text-base sm:text-lg font-bold text-indigo-300">
+          <div className={`text-center p-2 rounded-xl ${isDark ? 'bg-slate-900/50' : 'bg-white shadow-xs'}`}>
+            <span className={`text-[11px] block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>เฉลี่ยต่อคืน</span>
+            <span className={`text-base sm:text-lg font-bold ${isDark ? 'text-indigo-300' : 'text-indigo-600'}`}>
               {avgHoursFormatted}
             </span>
           </div>
-          <div className="text-center p-2 rounded-xl bg-slate-900/50">
-            <span className="text-[11px] text-slate-400 block">คุณภาพเฉลี่ย</span>
-            <span className="text-base sm:text-lg font-bold text-amber-300 flex items-center justify-center gap-1">
+          <div className={`text-center p-2 rounded-xl ${isDark ? 'bg-slate-900/50' : 'bg-white shadow-xs'}`}>
+            <span className={`text-[11px] block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>คุณภาพเฉลี่ย</span>
+            <span className={`text-base sm:text-lg font-bold flex items-center justify-center gap-1 ${
+              isDark ? 'text-amber-300' : 'text-amber-600'
+            }`}>
               <Star className="w-4 h-4 fill-amber-400 text-amber-400 inline" />
               {avgRating} / 5
             </span>
@@ -138,26 +151,34 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
       {records.length === 0 ? (
         <div
           id="empty-history-state"
-          className="text-center py-12 px-4 rounded-2xl bg-slate-950/40 border border-dashed border-slate-800"
+          className={`text-center py-12 px-4 rounded-2xl border border-dashed transition-colors ${
+            isDark
+              ? 'bg-slate-950/40 border-slate-800'
+              : 'bg-slate-50 border-slate-200'
+          }`}
         >
-          <div className="w-12 h-12 rounded-2xl bg-indigo-950/50 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-3">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 border ${
+            isDark
+              ? 'bg-indigo-950/50 border-indigo-500/20 text-indigo-400'
+              : 'bg-indigo-50 border-indigo-200 text-indigo-600'
+          }`}>
             <Moon className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-semibold text-slate-200">
+          <h3 className={`text-base font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
             ยังไม่มีประวัติการนอน
           </h3>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-sm mx-auto">
+          <p className={`text-xs sm:text-sm mt-1 max-w-sm mx-auto ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             กรอกข้อมูลเวลาเข้านอนและตื่นนอนในฟอร์มด้านบน แล้วกด "บันทึกข้อมูลการนอน" เพื่อเริ่มเก็บสถิติ
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+          <div className={`flex items-center justify-between text-xs px-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             <span>
               แสดง {displayedRecords.length} จากทั้งหมด {records.length} รายการ
             </span>
             {hasMore && !isExpanded && (
-              <span className="text-indigo-300 text-[11px]">
+              <span className={`text-[11px] font-medium ${isDark ? 'text-indigo-300' : 'text-indigo-600'}`}>
                 มีอีก {records.length - INITIAL_DISPLAY_COUNT} รายการด้านล่าง
               </span>
             )}
@@ -171,13 +192,19 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
                 <div
                   key={record.id}
                   id={`history-entry-${record.id}`}
-                  className="p-4 sm:p-5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-slate-700/80 transition-all shadow-md flex flex-col gap-3"
+                  className={`p-4 sm:p-5 rounded-2xl border transition-all shadow-sm flex flex-col gap-3 ${
+                    isDark
+                      ? 'bg-slate-950/70 border-slate-800 hover:border-slate-700/80'
+                      : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                  }`}
                 >
                   {/* Header: Date + Delete button */}
-                  <div className="flex items-center justify-between gap-2 border-b border-slate-800/60 pb-2.5">
+                  <div className={`flex items-center justify-between gap-2 border-b pb-2.5 ${
+                    isDark ? 'border-slate-800/60' : 'border-slate-200'
+                  }`}>
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-indigo-400" />
-                      <span className="text-sm font-semibold text-white">
+                      <Calendar className="w-4 h-4 text-indigo-500" />
+                      <span className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         {formatThaiDate(record.date)}
                       </span>
                     </div>
@@ -186,7 +213,11 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
                       id={`btn-delete-entry-${record.id}`}
                       type="button"
                       onClick={() => setDeleteTargetId(record.id)}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        isDark
+                          ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10'
+                          : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'
+                      }`}
                       title="ลบรายการนี้"
                       aria-label={`Delete record for ${record.date}`}
                     >
@@ -198,23 +229,27 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {/* Bed & Wake Times */}
                     <div className="flex flex-col justify-center space-y-1">
-                      <div className="flex items-center gap-2 text-xs text-slate-300">
-                        <Moon className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                        <Moon className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                         <span>เข้านอน: <strong>{record.bedTime} น.</strong></span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-300">
-                        <Sun className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                        <Sun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                         <span>ตื่นนอน: <strong>{record.wakeTime} น.</strong></span>
                       </div>
                     </div>
 
                     {/* Sleep Duration */}
                     <div className="flex flex-col justify-center">
-                      <div className="text-[11px] text-slate-400 mb-1 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-indigo-400" />
+                      <div className={`text-[11px] mb-1 flex items-center gap-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        <Clock className="w-3 h-3 text-indigo-500" />
                         <span>เวลานอนทั้งหมด:</span>
                       </div>
-                      <div className="inline-flex items-center self-start px-2.5 py-1 rounded-lg bg-indigo-950/80 border border-indigo-500/30 text-indigo-200 text-xs font-bold">
+                      <div className={`inline-flex items-center self-start px-2.5 py-1 rounded-lg text-xs font-bold border ${
+                        isDark
+                          ? 'bg-indigo-950/80 border-indigo-500/30 text-indigo-200'
+                          : 'bg-indigo-50 border-indigo-200 text-indigo-800'
+                      }`}>
                         {record.durationFormatted}
                       </div>
                     </div>
@@ -229,19 +264,21 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
                             className={`w-3.5 h-3.5 ${
                               s <= record.rating
                                 ? 'text-amber-400 fill-amber-400'
-                                : 'text-slate-700'
+                                : isDark
+                                ? 'text-slate-700'
+                                : 'text-slate-300'
                             }`}
                           />
                         ))}
-                        <span className="text-xs text-slate-400 ml-1">
+                        <span className={`text-xs ml-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                           ({record.rating}/5)
                         </span>
                       </div>
 
                       {/* Mood Badge */}
-                      <div className="inline-flex items-center gap-1.5 text-xs text-slate-200">
+                      <div className={`inline-flex items-center gap-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                         <span className="text-lg leading-none">{moodData.emoji}</span>
-                        <span className="font-medium text-slate-300">
+                        <span className={`font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                           {moodData.label}
                         </span>
                       </div>
@@ -250,8 +287,12 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
 
                   {/* Note section (if provided) */}
                   {record.note && (
-                    <div className="pt-2 border-t border-slate-800/40 text-xs text-slate-300 bg-slate-900/40 px-3 py-2 rounded-xl">
-                      <span className="text-slate-400 font-medium">โน้ต: </span>
+                    <div className={`pt-2 border-t text-xs px-3 py-2 rounded-xl ${
+                      isDark
+                        ? 'border-slate-800/40 text-slate-300 bg-slate-900/40'
+                        : 'border-slate-200 text-slate-700 bg-white'
+                    }`}>
+                      <span className={`font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>โน้ต: </span>
                       <span>"{record.note}"</span>
                     </div>
                   )}
@@ -267,16 +308,20 @@ export const SleepJournalHistory: React.FC<SleepJournalHistoryProps> = ({
                 id="btn-toggle-show-more-history"
                 type="button"
                 onClick={() => setIsExpanded((prev) => !prev)}
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-950/90 hover:bg-slate-800/90 border border-slate-800 hover:border-slate-700 text-indigo-300 hover:text-white text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-indigo-950/20 active:scale-95"
+                className={`w-full sm:w-auto px-6 py-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-sm active:scale-95 border ${
+                  isDark
+                    ? 'bg-slate-950/90 hover:bg-slate-800/90 border-slate-800 hover:border-slate-700 text-indigo-300 hover:text-white'
+                    : 'bg-white hover:bg-slate-50 border-slate-300 text-indigo-600 hover:text-indigo-800'
+                }`}
               >
                 {isExpanded ? (
                   <>
-                    <ChevronUp className="w-4 h-4 text-indigo-400" />
+                    <ChevronUp className="w-4 h-4 text-indigo-500" />
                     <span>ย่อประวัติลง (แสดงเพียง 4 รายการล่าสุด)</span>
                   </>
                 ) : (
                   <>
-                    <ChevronDown className="w-4 h-4 text-indigo-400" />
+                    <ChevronDown className="w-4 h-4 text-indigo-500" />
                     <span>
                       ดูเพิ่มเติม (+{records.length - INITIAL_DISPLAY_COUNT} รายการ)
                     </span>
